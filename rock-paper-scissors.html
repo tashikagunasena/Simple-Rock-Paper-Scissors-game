@@ -1,0 +1,388 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Rock Paper Scissors</title>
+
+    <style>
+      body {
+        margin: 0;
+        background: linear-gradient(135deg, #0f0f0f, #1c1c1c);
+        color: white;
+        font-family: Arial, Helvetica, sans-serif;
+        text-align: center;
+        overflow-x: hidden;
+      }
+
+      .container {
+        margin-top: 40px;
+      }
+
+      .title {
+        font-size: 36px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        background: linear-gradient(90deg, #00c6ff, #0072ff);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+      }
+
+      .btn1 {
+        background-color: transparent;
+        border: 3px solid white;
+        width: 120px;
+        height: 120px;
+        border-radius: 50%;
+        margin: 15px;
+        cursor: pointer;
+        font-size: 40px;
+        transition:
+          transform 0.2s,
+          background-color 0.3s;
+        animation: bounce 2s infinite;
+      }
+
+      .btn1:hover {
+        transform: scale(1.1);
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+
+      .btn1:active {
+        transform: scale(0.9);
+      }
+
+      @keyframes bounce {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-5px);
+        }
+      }
+
+      .result {
+        font-size: 30px;
+        font-weight: bold;
+        margin-top: 30px;
+      }
+
+      .win {
+        color: #4caf50;
+      }
+      .lose {
+        color: #f44336;
+      }
+      .tie {
+        color: #ffeb3b;
+      }
+
+      .moves {
+        margin-top: 20px;
+        font-size: 18px;
+        color: #ccc;
+      }
+
+      .score {
+        margin-top: 20px;
+        font-size: 20px;
+        color: #00e5ff;
+      }
+
+      .result-images {
+        margin-top: 30px;
+        display: flex;
+        justify-content: center;
+        gap: 80px;
+        align-items: center;
+      }
+
+      .result-box {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        width: 120px;
+      }
+
+      .result-box p {
+        margin-bottom: 10px;
+        font-size: 18px;
+        color: #aaa;
+      }
+
+      .emoji {
+        font-size: 70px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 80px;
+        width: 80px;
+        transition: 0.3s;
+      }
+
+      /* Stronger + visible glow */
+      .glow {
+        text-shadow:
+          0 0 5px #00e5ff,
+          0 0 15px #00e5ff,
+          0 0 25px #00e5ff,
+          0 0 40px #00e5ff;
+        transform: scale(1.25);
+      }
+
+      .reset-btn {
+        margin-top: 30px;
+        padding: 12px 25px;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        border-radius: 8px;
+        background: linear-gradient(90deg, #ff7e5f, #feb47b);
+        color: white;
+        transition: transform 0.2s;
+        animation: bounce 2s infinite;
+      }
+
+      .reset-btn:hover {
+        transform: scale(1.1);
+      }
+
+      .reset-btn:active {
+        transform: scale(0.9);
+      }
+
+      .auto-btn {
+        margin-top: 30px;
+        padding: 12px 25px;
+        font-size: 16px;
+        cursor: pointer;
+        border: none;
+        border-radius: 8px;
+        background: linear-gradient(90deg, #ff7e5f, #feb47b);
+        color: white;
+        transition: transform 0.2s;
+        animation: bounce 2s infinite;
+      }
+
+      .auto-btn:hover {
+        transform: scale(1.1);
+      }
+
+      .auto-btn:active {
+        transform: scale(0.9);
+      }
+
+      /* Confetti pieces */
+      .confetti {
+        position: fixed;
+        top: -10px;
+        width: 8px;
+        height: 8px;
+        opacity: 0.9;
+        animation: fall 2s linear forwards;
+        z-index: 9999;
+      }
+
+      @keyframes fall {
+        to {
+          transform: translateY(100vh) rotate(360deg);
+          opacity: 0;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <p class="title">Rock Paper Scissors</p>
+
+      <button class="btn1" onclick="playGame('rock')">✊</button>
+      <button class="btn1" onclick="playGame('paper')">✋</button>
+      <button class="btn1" onclick="playGame('scissors')">✌️</button>
+
+      <p class="js-result result"></p>
+
+      <div class="result-images">
+        <div class="result-box">
+          <p>You</p>
+          <div id="playerEmoji" class="emoji">❓</div>
+        </div>
+
+        <div class="result-box">
+          <p>Computer</p>
+          <div id="computerEmoji" class="emoji">❓</div>
+        </div>
+      </div>
+
+      <p class="js-moves moves"></p>
+      <p class="js-score score"></p>
+
+      <button class="reset-btn" onclick="resetScore()">Reset Score</button>
+    </div>
+    <button class="auto-btn" onclick="autoplay()">Auto Play</button>
+    <!-- Sounds -->
+    <audio
+      id="winSound"
+      src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_115b9c3d7b.mp3?filename=success-1-6297.mp3"
+    ></audio>
+    <audio
+      id="loseSound"
+      src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_0b6c9d2d2c.mp3?filename=negative_beeps-6008.mp3"
+    ></audio>
+    <audio
+      id="tieSound"
+      src="https://cdn.pixabay.com/download/audio/2022/03/10/audio_5b1f3c4c2d.mp3?filename=neutral-tone-6286.mp3"
+    ></audio>
+
+    <script>
+      let score = JSON.parse(localStorage.getItem("score"));
+
+      if (score === null) {
+        score = { wins: 0, losses: 0, ties: 0 };
+      }
+
+      function updateScoreDisplay() {
+        document.querySelector(".js-score").innerHTML =
+          `Wins: ${score.wins} | Losses: ${score.losses} | Ties: ${score.ties}`;
+      }
+
+      updateScoreDisplay();
+
+      function resetScore() {
+        score = { wins: 0, losses: 0, ties: 0 };
+        localStorage.removeItem("score");
+
+        document.getElementById("playerEmoji").innerHTML = "❓";
+        document.getElementById("computerEmoji").innerHTML = "❓";
+
+        document.getElementById("playerEmoji").classList.remove("glow");
+        document.getElementById("computerEmoji").classList.remove("glow");
+
+        document.querySelector(".js-result").innerHTML = "";
+        document.querySelector(".js-moves").innerHTML = "";
+
+        updateScoreDisplay();
+        alert("Score reset!");
+      }
+
+      function getEmoji(move) {
+        if (move === "rock") return "✊";
+        if (move === "paper") return "✋";
+        return "✌️";
+      }
+
+      function playSound(result) {
+        if (result === "You Win.") {
+          document.getElementById("winSound").play();
+        } else if (result === "You Lose.") {
+          document.getElementById("loseSound").play();
+        } else {
+          document.getElementById("tieSound").play();
+        }
+      }
+
+      function createConfetti() {
+        const colors = ["#00e5ff", "#4caf50", "#ffeb3b", "#ff4081", "#7c4dff"];
+
+        for (let i = 0; i < 40; i++) {
+          const confetti = document.createElement("div");
+          confetti.classList.add("confetti");
+
+          confetti.style.left = Math.random() * 100 + "vw";
+          confetti.style.backgroundColor =
+            colors[Math.floor(Math.random() * colors.length)];
+          confetti.style.animationDuration = Math.random() * 1 + 1.5 + "s";
+          confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+
+          document.body.appendChild(confetti);
+
+          setTimeout(() => {
+            confetti.remove();
+          }, 2500);
+        }
+      }
+
+      let isAutoPlaying = false;
+      let intervalId;
+
+      function autoplay() {
+        if (!isAutoPlaying) {
+          intervalId = setInterval(function () {
+            const playerMove = pickComputerMove();
+            playGame(playerMove);
+          }, 1000);
+          isAutoPlaying = true;
+        } else {
+          clearInterval(intervalId);
+          isAutoPlaying = false;
+        }
+      }
+
+      function playGame(playerMove) {
+        const computerMove = pickComputerMove();
+        let result = "";
+
+        if (playerMove === "scissors") {
+          if (computerMove === "rock") result = "You Lose.";
+          else if (computerMove === "paper") result = "You Win.";
+          else result = "Tie.";
+        } else if (playerMove === "paper") {
+          if (computerMove === "rock") result = "You Win.";
+          else if (computerMove === "paper") result = "Tie.";
+          else result = "You Lose.";
+        } else if (playerMove === "rock") {
+          if (computerMove === "rock") result = "Tie.";
+          else if (computerMove === "paper") result = "You Lose.";
+          else result = "You Win.";
+        }
+
+        if (result === "You Win.") score.wins++;
+        else if (result === "You Lose.") score.losses++;
+        else score.ties++;
+
+        localStorage.setItem("score", JSON.stringify(score));
+        updateScoreDisplay();
+
+        const resultElement = document.querySelector(".js-result");
+        resultElement.innerHTML = result;
+        resultElement.className = "js-result result " + getResultClass(result);
+
+        document.querySelector(".js-moves").innerHTML =
+          `You chose ${playerMove} vs Computer chose ${computerMove}`;
+
+        const playerEmoji = document.getElementById("playerEmoji");
+        const computerEmoji = document.getElementById("computerEmoji");
+
+        playerEmoji.innerHTML = getEmoji(playerMove);
+        computerEmoji.innerHTML = getEmoji(computerMove);
+
+        playerEmoji.classList.remove("glow");
+        computerEmoji.classList.remove("glow");
+
+        if (result === "You Win.") {
+          playerEmoji.classList.add("glow");
+          createConfetti(); // 🎉 CONFETTI ONLY ON WIN
+        } else if (result === "You Lose.") {
+          computerEmoji.classList.add("glow");
+        }
+
+        playSound(result);
+      }
+
+      function getResultClass(result) {
+        if (result === "You Win.") return "win";
+        if (result === "You Lose.") return "lose";
+        return "tie";
+      }
+
+      function pickComputerMove() {
+        const randomNumber = Math.random();
+
+        if (randomNumber < 1 / 3) return "rock";
+        else if (randomNumber < 2 / 3) return "paper";
+        else return "scissors";
+      }
+    </script>
+  </body>
+</html>
